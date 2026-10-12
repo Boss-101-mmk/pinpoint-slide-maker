@@ -243,3 +243,10 @@ Open the site with ?admin=1 to show the inbox. The token is held in memory only 
 Set ADMIN_TOKEN to a long random secret in the server environment. Keep it out of index.html and source control. Set CFG.API_BASE to the proxy base URL in index.html, and allow that origin in connect-src. Set ALLOWED_ORIGIN to the exact website origin. For local preview, use the same origin as the app's browser URL and a local-only token. Do not expose the admin inbox over plain HTTP on a public network.
 
 The inbox access form accepts either the admin token or a member email. A valid email registers the member through the configured sign-up store and remembers that membership in this browser's local storage, so it remains signed in after reloads on this device. This is email-only membership, not verified identity; use an email verification or password flow before treating it as secure authentication on a public site. The admin token is kept only in page memory.
+
+
+## GitHub Pages
+
+This repository includes `.github/workflows/deploy-pages.yml` to publish the static app whenever changes reach `main`. To enable it, open **Settings → Pages**, set the build source to **GitHub Actions**, then check the **Actions** tab for the first deployment. The site URL will be `https://boss-101-mmk.github.io/pinpoint-slide-maker/`.
+
+GitHub Pages serves only the static editor. It does not run the Node backend. To enable proxy-based AI research and centrally stored feedback, deploy `server/proxy.js` on a separate HTTPS Node host, copy `.env.example` to `.env`, set real values on the server, and configure `PINPOINT_CONFIG` and the Content Security Policy in `index.html` for that proxy. Never commit `.env` or put API keys or the admin token in the web page.
