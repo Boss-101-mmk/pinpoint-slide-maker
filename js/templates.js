@@ -63,8 +63,10 @@
     });
   }
 
-  PP.initTemplates = function () {
+  PP.rebuildThemes = function () {
     var themes = PP.$('themes');
+    if (!themes) return;
+    themes.replaceChildren();
     Object.entries(PP.THEMES).forEach(function (pair) {
       var k = pair[0], T = pair[1];
       var b = PP.el('button', 'chip');
@@ -76,12 +78,33 @@
       b.addEventListener('click', function () {
         PP.snapshot();
         PP.state.theme = k;
+        if (!String(k).startsWith('style-')) PP.lockedStyle = '';
         PP.syncThemeChips();
         if (PP.state.slides.length) { PP.strip(); PP.show(PP.state.i); }
       });
       themes.append(b);
     });
+    var sel = PP.$('sdTheme');
+    if (sel) {
+      if (![].some.call(sel.options, function (o) { return o.value === ''; })) {
+        var deckOpt = PP.el('option', null, 'Deck theme');
+        deckOpt.value = '';
+        sel.append(deckOpt);
+      }
+      var keep = sel.value;
+      while (sel.options.length > 1) sel.remove(1);
+      Object.entries(PP.THEMES).forEach(function (pair) {
+        var o = PP.el('option', null, pair[1].n);
+        o.value = pair[0];
+        sel.append(o);
+      });
+      if ([].some.call(sel.options, function (o) { return o.value === keep; })) sel.value = keep;
+    }
     PP.syncThemeChips();
+  };
+
+  PP.initTemplates = function () {
+    PP.rebuildThemes();
 
     var gallery = PP.$('tpls');
     PP.TEMPLATES.forEach(function (t) {

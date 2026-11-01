@@ -18,7 +18,7 @@ sandbox.window = sandbox;
 sandbox.globalThis = sandbox;
 sandbox.location = { search: '', href: 'http://127.0.0.1/index.html' };
 vm.createContext(sandbox);
-for (const file of ['js/core.js', 'js/ingest.js', 'js/visuals.js', 'js/canvas.js', 'js/assistant.js', 'js/storage.js']) {
+for (const file of ['js/core.js', 'js/ingest.js', 'js/visuals.js', 'js/canvas.js', 'js/stylebot.js', 'js/assistant.js', 'js/storage.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), sandbox, { filename: file });
 }
 const PP = sandbox.PP;
@@ -98,5 +98,12 @@ assert.strictEqual(extras[0].text.includes('Hello'), true);
 assert.strictEqual(extras[1].fill, '#3ee0b0');
 const laid = PP.defaultFrames({ kind: 'title', title: 'Hello', sub: 'There' }, 0);
 assert.ok(laid.title.w > 200 && laid.sub.y > laid.title.y);
+
+const styles = PP.rankStyles('a quiet board dinner for investors');
+assert.strictEqual(styles[0].id, 'style-brass');
+assert.strictEqual(styles.length, 3);
+assert.strictEqual(PP.rankStyles('').length, 3);
+const clinic = PP.rankStyles('a calm clinic by the coast');
+assert.strictEqual(clinic[0].id, 'style-linen');
 
 console.log('logic tests passed', { slides: pitch.length, ids: ids.length, templates: Object.keys(PP.KEYS).length });

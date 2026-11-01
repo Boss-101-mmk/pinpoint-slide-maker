@@ -185,14 +185,12 @@
 
   PP.initDesigner = function () {
     var theme = PP.$('sdTheme');
-    Object.entries(PP.THEMES).forEach(function (pair) {
-      var o = PP.el('option', null, pair[1].n);
-      o.value = pair[0];
-      theme.append(o);
-    });
-    var deck = PP.el('option', null, 'Deck theme');
-    deck.value = '';
-    theme.prepend(deck);
+    if (theme && ![].some.call(theme.options, function (o) { return o.value === ''; })) {
+      var deck = PP.el('option', null, 'Deck theme');
+      deck.value = '';
+      theme.append(deck);
+    }
+    if (PP.rebuildThemes) PP.rebuildThemes();
 
     [['sdTheme', 'theme'], ['sdFont', 'font'], ['sdAlign', 'align'], ['sdAnim', 'anim'], ['sdSpeed', 'speed'], ['sdTrans', 'trans']].forEach(function (pair) {
       PP.$(pair[0]).addEventListener('change', function (e) {

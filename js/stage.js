@@ -137,7 +137,8 @@
     PP.state.slides = s;
     if (PP.state.brand) PP.state.slides.forEach(function (x) { x.a1 = PP.state.brand.primary; x.a2 = PP.state.brand.secondary; });
     var bg = PP.TPL_BG[PP.currentTemplateName];
-    if (bg) PP.state.slides.forEach(function (x, i) { x.bgpic = bg; x.bgseed = PP.hash(PP.currentTemplateName + i); x.bgop = 38; });
+    if (bg && !PP.lockedStyle) PP.state.slides.forEach(function (x, i) { x.bgpic = bg; x.bgseed = PP.hash(PP.currentTemplateName + i); x.bgop = 38; });
+    if (PP.lockedStyle && PP.paintStyle) PP.paintStyle(PP.lockedStyle, true);
     PP.state.trash = [];
     PP.updateHistoryButtons();
     PP.enableDeckControls(true);

@@ -54,6 +54,15 @@
     </div>
     <div id="advice" role="status" aria-live="polite"></div>
 
+    <h2>Style bot</h2>
+    <p class="hint">Name the occasion. It offers three premium looks and keeps them on this device.</p>
+    <div class="row">
+      <input id="styleAsk" type="text" maxlength="120" placeholder="Board dinner, quiet luxury" aria-label="Describe the style you want">
+      <button id="styleGo" type="button">Suggest styles</button>
+    </div>
+    <div id="stylePicks" class="style-picks"></div>
+    <p id="styleNote" class="hint" role="status" aria-live="polite"></p>
+
     <h2>Or pick a template</h2>
     <div class="row template-filters">
       <input id="tplSearch" type="search" placeholder="Search templates" aria-label="Search templates">
@@ -425,6 +434,7 @@
 <script src="js/media.js"></script>
 <script src="js/assistant.js"></script>
 <script src="js/storage.js"></script>
+<script src="js/stylebot.js"></script>
 <script src="js/stage.js"></script>
 <script src="js/main.js"></script>
 </body>

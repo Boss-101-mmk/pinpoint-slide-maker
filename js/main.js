@@ -10,6 +10,7 @@
     PP.initAssistant();
     PP.initStorage();
     if (PP.initCanvas) PP.initCanvas();
+    if (PP.initStyleBot) PP.initStyleBot();
     PP.initStage();
     PP.initExport();
   } catch (e) {

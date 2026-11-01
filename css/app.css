@@ -189,6 +189,20 @@ label { color: var(--mu); font-size: .9rem; display: grid; gap: 4px; }
 }
 .tpl-preview b { font: 600 .78rem/1.15 var(--display); max-width: 72%; position: relative; z-index: 1; }
 .tpl-preview i { display: block; width: 40%; height: 3px; margin-top: 6px; border-radius: 5px; background: currentColor; opacity: .7; }
+.style-picks { display: grid; gap: 8px; }
+.style-card {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  border-radius: 14px;
+  padding: 8px;
+  background: #fff;
+}
+.style-swatch { height: 52px; border-radius: 10px; }
+.style-card strong { display: block; font-family: var(--display); font-size: 1rem; color: var(--tx); }
+.style-card small { color: var(--mu); font-size: .78rem; line-height: 1.35; }
 .themes { gap: 8px; }
 .chip { width: 36px; height: 36px; padding: 0; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line); }
 .chip[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--mint); }
