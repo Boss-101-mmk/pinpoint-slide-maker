@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; worker-src blob: https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data: blob: https://api.openverse.org; connect-src 'self' https://api.openverse.org; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light">
 <meta name="description" content="PinPoint turns notes, Word documents, and PDFs into a presentation you can present or download as PowerPoint.">
 <title>PinPoint: notes to presentation</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📍%3C/text%3E%3C/svg%3E">
@@ -16,13 +16,17 @@
 <a class="skip" href="#stage">Skip to slide preview</a>
 <header class="topbar">
   <div class="brand">
-    <svg width="30" height="34" viewBox="-52 -72 104 148" aria-hidden="true"><path d="M0-70C-30-70-52-48-52-20c0 36 52 90 52 90s52-54 52-90C52-48 30-70 0-70z" fill="#3ee0b0"/><circle cy="-20" r="18" fill="#07111a"/></svg>
+    <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="5" width="16" height="12" rx="2" fill="#e7c7b4"/><rect x="8" y="10" width="17" height="13" rx="2" fill="#c4522a"/></svg>
     <div>
       <strong>PinPoint</strong>
-      <p class="tagline">Notes, Word or PDF in. Presentation out.</p>
+      <p class="tagline">A deck from notes, ready to present.</p>
     </div>
   </div>
-  <p id="uses" role="status" aria-live="polite"></p>
+  <div class="top-actions">
+    <p id="uses" role="status" aria-live="polite"></p>
+    <button id="present" type="button" disabled>Present</button>
+    <button class="go" id="export" type="button" disabled title="Download a PowerPoint file">Download</button>
+  </div>
 </header>
 <main class="workspace">
   <section class="card panel" id="inputPanel" aria-label="Build a deck">
@@ -31,10 +35,10 @@
       <span class="move-hint">Drag to float</span>
       <button id="editorDock" type="button" aria-pressed="false">Float panel</button>
     </div>
-    <h2>Describe your idea</h2>
-    <textarea id="idea" class="idea" rows="3" maxlength="500" placeholder="e.g. I want to pitch my solar cold room idea to investors"></textarea>
+    <h2>Start with an idea</h2>
+    <textarea id="idea" class="idea" rows="3" maxlength="500" placeholder="A pitch for a solar cold room"></textarea>
     <div class="row">
-      <button class="go" id="advise" type="button">Synthesize AI Deck Outline</button>
+      <button id="advise" type="button">Make an outline</button>
       <label class="count-label" for="aiCount">Slides
         <select id="aiCount">
           <option>6</option>
@@ -45,12 +49,12 @@
       </label>
     </div>
     <div class="row research-row">
-      <label class="chk"><input id="research" type="checkbox" checked> Deep research with web sources</label>
-      <span class="hint">Searches current sources and adds citations when a proxy is configured.</span>
+      <label class="chk"><input id="research" type="checkbox"> Look up sources</label>
+      <span class="hint">Needs your own research server. Leave this off to draft offline.</span>
     </div>
     <div id="advice" role="status" aria-live="polite"></div>
 
-    <h2>Choose a design template</h2>
+    <h2>Or pick a template</h2>
     <div class="row template-filters">
       <input id="tplSearch" type="search" placeholder="Search templates" aria-label="Search templates">
       <select id="tplCategory" aria-label="Filter template category">
@@ -65,12 +69,12 @@
     </div>
     <div id="tpls" class="template-gallery"></div>
 
-    <h2>1. Add your content</h2>
-    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a document">Drop a .docx, .pdf, .txt or .md file here, or click to choose<input id="file" type="file" accept=".docx,.pdf,.txt,.md" hidden></div>
-    <label for="txt">Or paste your notes. Short lines become titles, and the lines under them become points.</label>
+    <h2>Or use your notes</h2>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a document">Drop a Word, PDF, or text file, or click to choose<input id="file" type="file" accept=".docx,.pdf,.txt,.md" hidden></div>
+    <label for="txt">Paste notes. A short line becomes a title. The lines under it become points.</label>
     <textarea id="txt" maxlength="60000" placeholder="# Title&#10;one-line subtitle&#10;&#10;Why it matters&#10;Farmers lose 30% of harvest&#10;Cold storage is 4x too costly"></textarea>
 
-    <h2>2. Pick a look</h2>
+    <h2>Choose colours</h2>
     <div class="row themes" id="themes" role="group" aria-label="Theme"></div>
     <p id="themeLabel" class="hint"></p>
     <div class="row">
@@ -100,7 +104,7 @@
       </div>
     </details>
     <div class="row">
-      <button class="go" id="build" type="button">Build presentation</button>
+      <button class="go" id="build" type="button">Build the deck</button>
     </div>
     <div id="toast" role="status" aria-live="polite"></div>
   </section>
@@ -109,13 +113,13 @@
     <div class="stage-frame">
       <div id="empty" class="empty">
         <div>
-          <h2>Your slides will show up here</h2>
-          <p id="emptyHint">Choose a template, drop a document, or paste notes, then press Build presentation.</p>
+          <h2>The deck shows up here</h2>
+          <p id="emptyHint">Pick a template or paste a few lines, then press Build the deck.</p>
         </div>
       </div>
       <div class="host" id="stage"></div>
     </div>
-    <p id="designHint" class="hint" hidden>Drag any block. Click selected text to retype it. Arrow keys nudge the selection. Added text and shapes travel with the PowerPoint file.</p>
+    <p id="designHint" class="hint" hidden>Drag a block to move it. Click it again to type. Arrow keys nudge.</p>
     <div id="formatBar" class="format-bar" hidden>
       <button type="button" data-act="size-down" title="Smaller text">A−</button>
       <button type="button" data-act="size-up" title="Larger text">A+</button>
@@ -138,7 +142,7 @@
         <button id="helpBtn" type="button" aria-haspopup="dialog">Shortcuts</button>
       </div>
       <div class="bar-group">
-        <button id="edit" type="button" aria-pressed="false" disabled>Design on slide</button>
+        <button id="edit" type="button" aria-pressed="false" disabled>Edit on slide</button>
         <button id="addText" type="button" disabled>Add text</button>
         <button id="addShape" type="button" disabled>Add shape</button>
         <button id="narrate" type="button" aria-pressed="false" disabled>Narrate</button>
@@ -147,12 +151,10 @@
       </div>
       <span class="sp"></span>
       <div class="bar-group">
-        <button id="present" type="button" disabled>Present</button>
-        <button id="saveDeck" type="button" disabled>Save editable deck</button>
+        <button id="saveDeck" type="button" disabled>Save deck</button>
         <button id="openDeck" type="button">Open deck</button>
         <input id="deckFile" type="file" accept="application/json,.json" hidden>
-        <button id="exportPdf" type="button" disabled>Print / Save PDF</button>
-        <button class="go" id="export" type="button" disabled>Download .pptx</button>
+        <button id="exportPdf" type="button" disabled>Save PDF</button>
       </div>
     </div>
     <div class="row history-row">
@@ -163,8 +165,11 @@
       <span id="autosaveStatus" role="status" aria-live="polite">Deck changes autosave in this browser.</span>
     </div>
 
+    <h2 class="strip-title">Slides <span class="hint">Drag the handle to reorder.</span></h2>
+    <div class="strip" id="strip" aria-label="Slides"></div>
+
     <div class="card block">
-      <h2>Slide designer</h2>
+      <h2>Adjust this slide</h2>
       <fieldset id="dz" class="dz" disabled>
         <fieldset class="subfieldset">
           <legend>Arrange</legend>
@@ -275,9 +280,6 @@
       <h2>Speaker notes</h2>
       <textarea id="notes" class="notes" maxlength="2000" placeholder="What you will say on this slide. Shown in Presenter Studio and saved in the .pptx."></textarea>
     </div>
-    <h2 class="strip-title">Slides <span class="hint">Drag a handle to reorder, or use Alt and the arrow keys.</span></h2>
-    <div class="strip" id="strip" aria-label="Slides"></div>
-
     <div class="card block" id="lib">
       <h2>Picture library</h2>
       <p class="hint">Add pictures, then click one to put it on the current slide. Built-in backgrounds in the slide designer need no download.</p>

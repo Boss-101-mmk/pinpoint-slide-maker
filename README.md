@@ -179,4 +179,4 @@ GitHub Pages does not run `server/proxy.js`. Deploy that on a separate HTTPS hos
 
 ## Design notes
 
-Themes are original palettes. Slide illustrations are generated as SVG so they work offline and are not stock art. The same title keeps the same illustration.
+The app chrome is a light paper studio: warm background, serif headings, and one terracotta action. Slide themes stay separate, so a dark deck still sits on a quiet page. Present and Download stay in the header. Illustrations are generated as SVG, so they work offline and are not stock art. The same title keeps the same illustration.
