@@ -9,6 +9,7 @@
     PP.initMedia();
     PP.initAssistant();
     PP.initStorage();
+    if (PP.initCanvas) PP.initCanvas();
     PP.initStage();
     PP.initExport();
   } catch (e) {

@@ -170,5 +170,5 @@
   };
 
   PP.sel = function () { return PP.state.slides[PP.state.i]; };
-  PP.deckButtons = ['present', 'export', 'exportPdf', 'pic', 'narrate', 'edit', 'saveDeck'];
+  PP.deckButtons = ['present', 'export', 'exportPdf', 'pic', 'narrate', 'edit', 'saveDeck', 'addText', 'addShape'];
 })(typeof window !== 'undefined' ? window : globalThis);

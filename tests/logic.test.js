@@ -18,7 +18,7 @@ sandbox.window = sandbox;
 sandbox.globalThis = sandbox;
 sandbox.location = { search: '', href: 'http://127.0.0.1/index.html' };
 vm.createContext(sandbox);
-for (const file of ['js/core.js', 'js/ingest.js', 'js/visuals.js', 'js/assistant.js', 'js/storage.js']) {
+for (const file of ['js/core.js', 'js/ingest.js', 'js/visuals.js', 'js/canvas.js', 'js/assistant.js', 'js/storage.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), sandbox, { filename: file });
 }
 const PP = sandbox.PP;
@@ -84,5 +84,19 @@ assert.strictEqual(tpl[1], Object.keys(PP.KEYS).join(', '));
 const deck = PP.parseDeck('{"template":"Team update","why":"Weekly.","slides":[{"kind":"title","title":"Hello","sub":"There"},{"kind":"bullets","title":"Points","items":["One","Two"]},{"kind":"closing","title":"Thanks","sub":"Bye"}]}');
 assert.strictEqual(deck.template, 'Team update');
 assert.strictEqual(deck.slides.length, 3);
+
+const frames = PP.sanitizeFrames({ title: { x: 10, y: 20, w: 30, h: 40 }, nope: { x: 1, y: 1, w: 1, h: 1 }, bad: { x: 'a' } });
+assert.deepStrictEqual(Object.keys(frames), ['title']);
+assert.strictEqual(frames.title.w, 36);
+const extras = PP.sanitizeExtras([
+  { id: 'ok', kind: 'text', x: 1, y: 2, w: 200, h: 80, text: 'Hello <b>', color: '#112233' },
+  { id: 'no', kind: 'script', x: 1, y: 2, w: 80, h: 80 },
+  { id: 'sh', kind: 'shape', shape: 'ellipse', x: 4, y: 5, w: 90, h: 90, fill: 'red' }
+]);
+assert.strictEqual(extras.length, 2);
+assert.strictEqual(extras[0].text.includes('Hello'), true);
+assert.strictEqual(extras[1].fill, '#3ee0b0');
+const laid = PP.defaultFrames({ kind: 'title', title: 'Hello', sub: 'There' }, 0);
+assert.ok(laid.title.w > 200 && laid.sub.y > laid.title.y);
 
 console.log('logic tests passed', { slides: pitch.length, ids: ids.length, templates: Object.keys(PP.KEYS).length });

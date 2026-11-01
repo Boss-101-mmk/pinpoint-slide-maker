@@ -240,7 +240,19 @@
       else return PP.toast('Nothing more to remove.');
       PP.refreshStage();
     });
-    PP.$('sdReplay').addEventListener('click', function () { PP.show(PP.state.i); });
+    PP.$('sdReplay').addEventListener('click', function () {
+      var was = PP.state.edit;
+      PP.state.edit = false;
+      if (PP.clearCanvasSel) PP.clearCanvasSel();
+      PP.show(PP.state.i);
+      if (!was) return;
+      setTimeout(function () {
+        PP.state.edit = true;
+        var b = PP.$('edit');
+        if (b) b.setAttribute('aria-pressed', 'true');
+        PP.show(PP.state.i);
+      }, 1400);
+    });
     PP.$('sdAll').addEventListener('click', function () {
       var s = PP.sel();
       if (!s) return;

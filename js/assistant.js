@@ -152,6 +152,7 @@
       PP.state.i = 0;
       PP.$('txt').value = toText(deck.slides);
       PP.enableDeckControls(true);
+      if (PP.enterDesign) PP.enterDesign();
       PP.strip();
       PP.show(0);
       PP.Usage.bump();

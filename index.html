@@ -115,6 +115,17 @@
       </div>
       <div class="host" id="stage"></div>
     </div>
+    <p id="designHint" class="hint" hidden>Drag any block. Click selected text to retype it. Arrow keys nudge the selection. Added text and shapes travel with the PowerPoint file.</p>
+    <div id="formatBar" class="format-bar" hidden>
+      <button type="button" data-act="size-down" title="Smaller text">A−</button>
+      <button type="button" data-act="size-up" title="Larger text">A+</button>
+      <label class="fmt-color">Colour <input id="fmtColor" type="color" value="#ffffff" aria-label="Object colour"></label>
+      <button type="button" data-act="bold" title="Bold">B</button>
+      <button type="button" data-act="align" title="Align text">Align</button>
+      <button type="button" data-act="center" title="Center on the slide">Center</button>
+      <button type="button" data-act="dup">Duplicate</button>
+      <button type="button" data-act="del">Remove</button>
+    </div>
     <div class="bar" role="toolbar" aria-label="Presentation controls">
       <div class="bar-group">
         <button id="prev" type="button" disabled>Back</button>
@@ -127,7 +138,9 @@
         <button id="helpBtn" type="button" aria-haspopup="dialog">Shortcuts</button>
       </div>
       <div class="bar-group">
-        <button id="edit" type="button" aria-pressed="false" disabled>Live Edit Canvas</button>
+        <button id="edit" type="button" aria-pressed="false" disabled>Design on slide</button>
+        <button id="addText" type="button" disabled>Add text</button>
+        <button id="addShape" type="button" disabled>Add shape</button>
         <button id="narrate" type="button" aria-pressed="false" disabled>Narrate</button>
         <button id="pic" type="button" disabled>Add picture</button>
         <input id="picfile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
@@ -367,7 +380,8 @@
       <li><span>Undo</span><kbd>Ctrl</kbd> <kbd>Z</kbd></li>
       <li><span>Redo</span><kbd>Ctrl</kbd> <kbd>Y</kbd> or <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Z</kbd></li>
       <li><span>Save editable deck</span><kbd>Ctrl</kbd> <kbd>S</kbd></li>
-      <li><span>Duplicate slide</span><kbd>Ctrl</kbd> <kbd>D</kbd></li>
+      <li><span>Duplicate object or slide</span><kbd>Ctrl</kbd> <kbd>D</kbd></li>
+      <li><span>Nudge a selected block</span><kbd>Arrows</kbd></li>
       <li><span>Build presentation</span><kbd>Ctrl</kbd> <kbd>Enter</kbd></li>
       <li><span>Reorder current slide</span><kbd>Alt</kbd> <kbd>Left</kbd> <kbd>Right</kbd></li>
       <li><span>Previous or next</span><kbd>Left</kbd> <kbd>Right</kbd> <kbd>Space</kbd></li>
@@ -402,6 +416,7 @@
 <script src="js/core.js"></script>
 <script src="js/ingest.js"></script>
 <script src="js/visuals.js"></script>
+<script src="js/canvas.js"></script>
 <script src="js/templates.js"></script>
 <script src="js/export.js"></script>
 <script src="js/designer.js"></script>

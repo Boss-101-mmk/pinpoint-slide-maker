@@ -141,6 +141,7 @@
     PP.state.trash = [];
     PP.updateHistoryButtons();
     PP.enableDeckControls(true);
+    if (PP.enterDesign) PP.enterDesign();
     PP.strip();
     PP.show(0);
     if (opts !== true && PP.Usage) PP.Usage.bump();
@@ -265,6 +266,9 @@
     PP.$('edit').addEventListener('click', function () {
       PP.state.edit = !PP.state.edit;
       PP.$('edit').setAttribute('aria-pressed', String(PP.state.edit));
+      var hint = PP.$('designHint');
+      if (hint) hint.hidden = !PP.state.edit;
+      if (!PP.state.edit && PP.clearCanvasSel) PP.clearCanvasSel();
       PP.show(PP.state.i);
     });
     PP.$('narrate').addEventListener('click', PP.narrate);
@@ -296,7 +300,12 @@
       if (typing || dialogOpen()) return;
       if (meta && key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) PP.redo(); else PP.undo(); return; }
       if (meta && key.toLowerCase() === 'y') { e.preventDefault(); PP.redo(); return; }
-      if (meta && key.toLowerCase() === 'd') { e.preventDefault(); PP.duplicateSlide(); return; }
+      if (meta && key.toLowerCase() === 'd') {
+        e.preventDefault();
+        if (PP.canvasSel && PP.state.edit && PP.duplicateSelection) PP.duplicateSelection();
+        else PP.duplicateSlide();
+        return;
+      }
       if (key === '?' || (e.shiftKey && key === '/')) { e.preventDefault(); PP.openHelp(); return; }
       if (!PP.state.slides.length) {
         if (key === 'p' || key === 'P') return;
@@ -307,6 +316,18 @@
         PP.moveSlide(key === 'ArrowLeft' ? -1 : 1);
         return;
       }
+      if (!meta && !e.altKey && PP.state.edit && PP.canvasSel && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].indexOf(key) >= 0) {
+        e.preventDefault();
+        var step = e.shiftKey ? 20 : 4;
+        PP.nudgeSelection(key === 'ArrowLeft' ? -step : key === 'ArrowRight' ? step : 0, key === 'ArrowUp' ? -step : key === 'ArrowDown' ? step : 0);
+        return;
+      }
+      if ((key === 'Delete' || key === 'Backspace') && PP.state.edit && PP.canvasSel && PP.$('pres').hidden) {
+        e.preventDefault();
+        PP.deleteSelection();
+        return;
+      }
+      if (key === 'Escape' && PP.$('pres').hidden && PP.canvasSel) { PP.clearCanvasSel(); return; }
       if (meta || e.altKey) return;
       if (['ArrowRight', 'PageDown', ' '].indexOf(key) >= 0) { e.preventDefault(); PP.show(PP.state.i + 1); }
       else if (['ArrowLeft', 'PageUp'].indexOf(key) >= 0) { e.preventDefault(); PP.show(PP.state.i - 1); }

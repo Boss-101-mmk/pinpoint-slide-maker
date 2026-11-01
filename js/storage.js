@@ -90,6 +90,7 @@
       PP.syncThemeChips();
       PP.updateHistoryButtons();
       PP.enableDeckControls(true);
+      if (PP.enterDesign) PP.enterDesign();
       PP.strip();
       PP.show(0);
       PP.toast('Version restored.', true);
@@ -229,6 +230,12 @@
       if (x.speed === 'fast' || x.speed === 'slow') z.speed = x.speed;
       if (PP.MOTIONS.indexOf(x.trans) >= 0) z.trans = x.trans;
       if (Number.isFinite(+x.size) && +x.size >= 70 && +x.size <= 140) z.size = +x.size;
+      if (PP.sanitizeFrames) {
+        var fr = PP.sanitizeFrames(x.frames);
+        if (fr) z.frames = fr;
+        var extras = PP.sanitizeExtras(x.extras);
+        if (extras.length) z.extras = extras;
+      }
       return z;
     });
     var brand = null;
@@ -278,6 +285,7 @@
       PP.syncThemeChips();
       PP.updateHistoryButtons();
       PP.enableDeckControls(true);
+      if (PP.enterDesign) PP.enterDesign();
       PP.strip();
       PP.show(0);
       PP.Usage.bump();
