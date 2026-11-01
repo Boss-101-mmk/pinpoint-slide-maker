@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; worker-src blob: https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data: blob: https://api.openverse.org; connect-src 'self' https://api.openverse.org; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; worker-src blob: https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data: blob: https://api.openverse.org; connect-src 'self' https://api.openverse.org https://en.wikipedia.org; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
@@ -38,7 +38,7 @@
     <h2>Start with an idea</h2>
     <textarea id="idea" class="idea" rows="3" maxlength="500" placeholder="A pitch for a solar cold room"></textarea>
     <div class="row">
-      <button id="advise" type="button">Make an outline</button>
+      <button id="advise" type="button">Research and build</button>
       <label class="count-label" for="aiCount">Slides
         <select id="aiCount">
           <option>6</option>
@@ -49,8 +49,8 @@
       </label>
     </div>
     <div class="row research-row">
-      <label class="chk"><input id="research" type="checkbox"> Look up sources</label>
-      <span class="hint">Needs your own research server. Leave this off to draft offline.</span>
+      <label class="chk"><input id="research" type="checkbox"> Also use my research server</label>
+      <span class="hint">Wikipedia is used either way. This adds your proxy only when it is configured.</span>
     </div>
     <div id="advice" role="status" aria-live="polite"></div>
 

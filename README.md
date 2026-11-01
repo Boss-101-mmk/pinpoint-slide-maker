@@ -109,7 +109,9 @@ Slide transitions: Slide, Fade, Zoom, Cinematic, Wipe, None. Titles reveal word 
 
 ## Online drafting
 
-Type an idea, choose 6 to 12 slides, and press **Synthesize AI Deck Outline**. With no proxy, PinPoint scores the idea against the templates and fills an outline you can edit. It does not invent a finished essay.
+Type an idea and press **Research and build**. PinPoint looks the topic up on Wikipedia, turns the page summaries into slides, and puts the page title and URL in the speaker notes. Download .pptx keeps those notes, so the sources travel with the file. The wording is shortened from the cited pages and stays under CC BY-SA. Check it before you present. If the lookup fails, you still get an outline you can fill in.
+
+Tick **Also use my research server** only when `js/config.js` points at your proxy. That path can add the proxy's web search on top of the public lookup. With no proxy, the tick is ignored and Wikipedia is still used.
 
 If `js/config.js` sets `AI_ENDPOINT`, the first available engine is used:
 
@@ -119,7 +121,7 @@ If `js/config.js` sets `AI_ENDPOINT`, the first available engine is used:
 | Your site, with `server/proxy.js` | Your proxy, which calls Anthropic |
 | Anything else | The offline outline |
 
-If the online call fails, the offline outline is used when deep research is off. With **Deep research with web sources** checked and no proxy, PinPoint explains the missing setup instead of pretending it searched the web.
+If the proxy call fails, PinPoint uses the Wikipedia research above, then the offline outline.
 
 Content rule: the prompt forbids invented statistics and names of real organisations. Placeholders look like `[30%]`. Check names, dates, and claims before presenting.
 

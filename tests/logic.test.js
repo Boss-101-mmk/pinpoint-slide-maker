@@ -106,4 +106,14 @@ assert.strictEqual(PP.rankStyles('').length, 3);
 const clinic = PP.rankStyles('a calm clinic by the coast');
 assert.strictEqual(clinic[0].id, 'style-linen');
 
+const researched = PP.slidesFromResearch('Solar power', [{
+  title: 'Solar power',
+  description: 'Conversion of sunlight into electricity',
+  url: 'https://en.wikipedia.org/wiki/Solar_power',
+  extract: 'Solar power is the conversion of energy from sunlight into electricity. Photovoltaic cells convert light into electric current using the photovoltaic effect. Concentrated solar power uses lenses or mirrors to focus sunlight onto a receiver.'
+}]);
+assert.ok(researched.some(function (s) { return s.title === 'Sources' && s.notes.indexOf('https://en.wikipedia.org/wiki/Solar_power') >= 0; }));
+assert.ok(researched[1].notes.indexOf('CC BY-SA') >= 0);
+assert.strictEqual(PP.slidesFromResearch('Empty', [{ title: 'Nope', url: 'https://en.wikipedia.org/wiki/Nope', extract: 'Too short.' }]), null);
+
 console.log('logic tests passed', { slides: pitch.length, ids: ids.length, templates: Object.keys(PP.KEYS).length });

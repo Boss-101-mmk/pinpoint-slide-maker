@@ -180,18 +180,154 @@
     } finally { btn.disabled = false; }
   };
 
+  function topicOf(idea) {
+    var topic = String(idea || '').split(/[.!?\n]/)[0]
+      .replace(/^(please\s+)?(i\s+)?(want|need|would like)\s+(to\s+)?/i, '')
+      .replace(/^(make|create|build|prepare|give|do|present|research)\s+(me\s+)?(a\s+|an\s+|the\s+)?(presentation|powerpoint|deck|slides?)\s+(about|on|for|of)?\s*/i, '')
+      .replace(/^(a|an|the)\s+(presentation|deck|talk|pitch)\s+(about|on|for|of)\s+/i, '')
+      .trim();
+    var head = topic.split(/\s+(?:and|for|about|with|into|in|on)\s+/i)[0].trim();
+    if (head.length >= 3) topic = head;
+    topic = (topic || idea).slice(0, 80);
+    return topic.charAt(0).toUpperCase() + topic.slice(1);
+  }
+
+  function onTopic(page, query) {
+    var words = String(query || '').toLowerCase().split(/\W+/).filter(function (w) { return w.length > 3; });
+    if (!words.length) return true;
+    var hay = (page.title + ' ' + String(page.extract || '').slice(0, 500)).toLowerCase();
+    return words.some(function (w) { return hay.indexOf(w) >= 0; });
+  }
+
+  function wikiSentences(extract) {
+    return String(extract || '').replace(/\s+/g, ' ').split(/(?<=[.!?])\s+/).map(function (s) { return s.trim(); }).filter(function (s) {
+      return s.length >= 40 && s.length <= 220 && !/may refer to/i.test(s);
+    });
+  }
+
+  PP.slidesFromResearch = function (topic, pages) {
+    var usable = (pages || []).filter(function (p) { return p && p.title && p.url && wikiSentences(p.extract).length >= 2; }).slice(0, 4);
+    if (!usable.length) return null;
+    var slides = [{
+      kind: 'title',
+      title: PP.cleanStr(topic, 70),
+      sub: PP.cleanStr(usable[0].description || 'What the sources say', 140),
+      notes: 'The following slides shorten public-source text. Read each cited page before presenting.'
+    }];
+    usable.forEach(function (page) {
+      var lines = wikiSentences(page.extract).slice(0, 4).map(function (s) {
+        return s.length > 120 ? s.slice(0, 117).replace(/\s+\S*$/, '') + '…' : s;
+      });
+      slides.push({
+        kind: 'bullets',
+        title: PP.cleanStr(page.title, 70),
+        items: lines,
+        notes: 'Source: ' + page.title + ', Wikipedia, CC BY-SA. ' + page.url
+      });
+    });
+    slides.push({
+      kind: 'bullets',
+      title: 'Sources',
+      items: usable.map(function (p, i) { return '[' + (i + 1) + '] ' + PP.cleanStr(p.title, 64) + ' · Wikipedia'; }),
+      notes: usable.map(function (p, i) { return '[' + (i + 1) + '] ' + p.title + ': ' + p.url; }).join('\n')
+    });
+    slides.push({
+      kind: 'closing',
+      title: 'Check the sources',
+      sub: 'Names and figures come from the cited pages. Confirm them before you present.',
+      notes: 'Wikipedia text is used under CC BY-SA. Keep the source links in these notes.'
+    });
+    return slides.slice(0, PP.CFG.MAX_SLIDES);
+  };
+
+  async function wikiSearch(query) {
+    var url = 'https://en.wikipedia.org/w/api.php?' + new URLSearchParams({
+      action: 'query', list: 'search', srsearch: query, srlimit: '4', format: 'json', origin: '*', utf8: '1'
+    });
+    var r = await fetch(url, { referrerPolicy: 'no-referrer' });
+    if (!r.ok) throw new Error('Research search failed.');
+    var data = await r.json();
+    return ((data.query && data.query.search) || []).map(function (row) { return row.title; }).filter(Boolean);
+  }
+
+  async function wikiSummary(title) {
+    var r = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title), { referrerPolicy: 'no-referrer' });
+    if (!r.ok) return null;
+    var j = await r.json();
+    var page = j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page;
+    if (!page || String(page).indexOf('https://') !== 0) return null;
+    return { title: j.title || title, description: j.description || '', extract: j.extract || '', url: page };
+  }
+
+  function installDeck(slides, note) {
+    var low = (PP.$('idea').value || '').toLowerCase();
+    var rank = Object.entries(PP.KEYS).map(function (pair) {
+      return [pair[0], (low.match(new RegExp(pair[1].source, 'g')) || []).length];
+    }).sort(function (a, b) { return b[1] - a[1]; });
+    var best = rank[0][1] ? rank[0][0] : 'Pitch deck';
+    var tpl = PP.TEMPLATES.find(function (x) { return x.n === best; }) || PP.TEMPLATES[0];
+    PP.snapshot();
+    PP.state.theme = tpl.theme;
+    PP.syncThemeChips();
+    PP.state.slides = slides;
+    if (PP.state.brand) PP.state.slides.forEach(function (x) { x.a1 = PP.state.brand.primary; x.a2 = PP.state.brand.secondary; });
+    PP.state.trash = [];
+    PP.updateHistoryButtons();
+    PP.state.i = 0;
+    PP.$('txt').value = toText(slides);
+    PP.enableDeckControls(true);
+    if (PP.enterDesign) PP.enterDesign();
+    if (PP.lockedStyle && PP.paintStyle) PP.paintStyle(PP.lockedStyle, true);
+    PP.strip();
+    PP.show(0);
+    PP.Usage.bump();
+    return note;
+  }
+
+  PP.researchIdea = async function (idea, out) {
+    var topic = topicOf(idea);
+    var status = PP.el('div', null, 'Researching “' + topic + '”…');
+    out.append(status);
+    var titles = await wikiSearch(topic);
+    var found = [];
+    for (var title of titles) {
+      var page = await wikiSummary(title);
+      if (page && !/disambiguation/i.test(page.title) && !/may refer to/i.test(page.extract)) found.push(page);
+    }
+    var pages = found.filter(function (page) { return onTopic(page, topic); });
+    if (!pages.length) pages = found;
+    var slides = PP.slidesFromResearch(topic, pages);
+    if (!slides) return false;
+    status.textContent = installDeck(slides, 'Research is on the slides. Sources are on the Sources slide and in the PowerPoint notes.');
+    var list = PP.el('div');
+    list.append(PP.el('strong', null, 'Sources: '));
+    pages.slice(0, 4).forEach(function (p) {
+      var a = PP.el('a', null, p.title);
+      a.href = p.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.style.marginRight = '10px';
+      list.append(a);
+    });
+    out.append(list);
+    out.append(PP.el('div', null, 'Taken from Wikipedia under CC BY-SA. Check the wording before you present. Download keeps the source links in the speaker notes.'));
+    return true;
+  };
+
   PP.advise = async function () {
     var idea = PP.Sec.clean(PP.$('idea').value).trim().slice(0, 500);
     var out = PP.$('advice');
     out.replaceChildren();
     if (idea.length < 8) { out.textContent = 'Type your idea in a sentence or two first.'; return; }
     if (PP.Usage.blocked()) return void PP.Signup.open(PP.advise);
-    var research = PP.$('research').checked;
-    if (research && !PP.CFG.AI_ENDPOINT) {
-      out.textContent = 'Deep research needs the secure AI proxy. Set window.PINPOINT_CONFIG.AI_ENDPOINT to your /deck address and enable Anthropic web search. See the README. An offline outline is still available if you turn research off.';
-      return;
-    }
-    if (await PP.tryOnline(idea, out, research)) return;
+    var btn = PP.$('advise');
+    btn.disabled = true;
+    try {
+      if (PP.$('research').checked && PP.CFG.AI_ENDPOINT && await PP.tryOnline(idea, out, true)) return;
+      try {
+        if (await PP.researchIdea(idea, out)) return;
+      } catch (e) {
+        PP.log(e);
+        out.append(PP.el('div', null, 'Public research did not respond. Building an outline you can fill in.'));
+      }
+    } finally { btn.disabled = false; }
     var low = idea.toLowerCase();
     var rank = Object.entries(PP.KEYS).map(function (pair) {
       return [pair[0], (low.match(new RegExp(pair[1].source, 'g')) || []).length];
