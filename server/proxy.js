@@ -6,7 +6,7 @@ const http=require('http'),fs=require('fs'),path=require('path'),crypto=require(
 const KEY=process.env.ANTHROPIC_API_KEY,ORIGIN=process.env.ALLOWED_ORIGIN,ADMIN_TOKEN=process.env.ADMIN_TOKEN,PORT=+process.env.PORT||8787;
 const MODEL=process.env.ANTHROPIC_MODEL||'claude-sonnet-5-5',LIMIT=+process.env.HOURLY_LIMIT||8;
 if(!ORIGIN){console.error('Set ALLOWED_ORIGIN first.');process.exit(1)}
-const TPLS='Pitch deck, Investor deck, Business report, Lesson, Proposal, Event, Product launch, Marketing plan, Case study, Impact report, Workshop';
+const TPLS='Investor deck, Pitch deck, Business report, Lesson, Proposal, Event, Product launch, Marketing plan, Case study, Impact report, Workshop, Team update, Conference talk';
 const prompt=(idea,n)=>`You are a presentation designer and writer. Turn this idea into a complete, ready-to-present deck of about ${n} slides.
 
 IDEA: ${idea}
@@ -24,7 +24,7 @@ Each slide is one of:
 {"kind":"closing","title":"Thank you or Contact","sub":"call to action"}
 Every slide may also have "notes": 1 to 3 sentences the speaker can say.
 
-Rules: start with a title slide and end with a closing slide. Use a variety of kinds. Write specific, persuasive, real-world content for the idea, in plain words, with titles under 50 characters. Never invent statistics, names or facts about real organisations. Where a number would help, write an illustrative placeholder in square brackets such as [30%] so the person can replace it. Write in the same language as the idea.`; // keep identical to DECK_PROMPT in index.html
+Rules: start with a title slide and end with a closing slide. Use a variety of kinds. Write specific, persuasive, real-world content for the idea, in plain words, with titles under 50 characters. Never invent statistics, names or facts about real organisations. Where a number would help, write an illustrative placeholder in square brackets such as [30%] so the person can replace it. Write in the same language as the idea.`; // keep identical to PP.DECK_PROMPT in js/assistant.js
 const researchPrompt=(idea,n)=>'Research this topic on the live web before writing the deck. Search multiple independent, credible sources. Prefer primary research, official statistics, government, universities, and reputable organizations. Compare dates and note disagreement or uncertainty. Then write a useful '+n+'-slide presentation grounded in the research.\nIDEA: '+idea+'\nNever invent facts, statistics, quotes, sources, or organizations. Use claims supported by sources. If strong evidence is unavailable, say so or use a clearly marked placeholder. Keep slide text concise and specific. Put source titles, publication dates, and URLs in speaker notes on relevant slides. Start with a title slide and end with a closing slide. Include varied layouts and choose one template from: '+TPLS+'.\nReply with one JSON object only, no markdown: {"template":"<template name>","why":"<one sentence>","slides":[{"kind":"title","title":"...","sub":"..."},{"kind":"bullets","title":"...","items":["..."],"notes":"Evidence and source attribution..."},{"kind":"closing","title":"...","sub":"..."}]}';const DATA=process.env.DATA_DIR||path.join(__dirname,'data');fs.mkdirSync(DATA,{recursive:true});
 const MAXFILE=10*1024*1024,EMAIL=/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]{2,}$/;
 const clean=(v,n)=>(typeof v==='string'?v:'').replace(/[\u0000-\u001F\u007F​-‏‪-‮]/g,' ').replace(/\s+/g,' ').trim().slice(0,n);
